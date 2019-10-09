@@ -1,15 +1,17 @@
 game = Classe:extend()
 
 function game:new()
-    largura_tela = love.graphics.getWidth()
+	largura_tela = love.graphics.getWidth()
     altura_tela = love.graphics.getHeight()
     player1 = player(largura_tela/2, altura_tela/2)
     player1.x = player1.x-player1.largura/2
     player1.y = player1.y-player1.altura/2
     seguidor = pupilos(player1.x, player1.y)
 
-
+    --pupilos
     pupilos:new(player1.x, player1.y)
+    maxPup = 15
+
     --temporizador = 0
     tabelaPupilos = {}
     controlePupins = 0
@@ -41,15 +43,15 @@ function game:update(dt)
 
         seguidor = pupilos(player1.x, player1.y) --Um objeto chamado seguidor é criado
         table.insert(tabelaPupilos, seguidor) -- O objeto é inserido dentro da table
-    elseif controlePupins < 15 then  
+    elseif controlePupins < maxPup then  
 
         seguidor = pupilos(tabelaPupilos[controlePupins-1].xB, tabelaPupilos[controlePupins-1].yB)
         table.insert(tabelaPupilos, seguidor)
     end
 
-      if controlePupins > 5 then
-        controlePupins = 5
-      end
+    if controlePupins > maxPup then
+       controlePupins = maxPup
+     end
       timing=0 --O timing é zerado para que outro pupilo seja criado
 
     --seguidor:update(dt, player1.x, player1.y)
@@ -59,7 +61,7 @@ function game:update(dt)
   for i, seguidor in pairs(tabelaPupilos) do  --Essa é a função de atualização dos pupilos da tabela
     if i == 1 then
       seguidor:update(dt, player1.x, player1.y)
-    elseif i < 15 then
+    elseif i < maxPup then
       seguidor:update(dt, tabelaPupilos[i-1].xB, tabelaPupilos[i-1].yB)
     end
   end
@@ -80,7 +82,22 @@ function game:update(dt)
      for j, tuba in pairs(tabelatuba) do
       tuba:update(dt)
      end 
+
   --checando as colisões
+  for i, pupilo in pairs(tabelaPupilos) do
+    for j, tuba in pairs(tabelatuba) do
+      if colisao(pupilo, tuba) then
+        table.remove(tabelaPupilos, i)
+      end 
+    end
+  end
+  
+  for i, tuba in pairs(tabelatuba) do
+    if colisaoP(player1, tuba) then
+      player1.vidas = player1.vidas - 1
+    end
+  end
+
 
 end
 
@@ -89,20 +106,29 @@ function game:draw()
   love.graphics.print("fps: "..delta.." fps", 40, 40)
   love.graphics.print("time: "..timing.." s", 40, 60)
   love.graphics.print("controlePupins: "..controlePupins.." pupilos", 40, 80)
+  love.graphics.print("Vida do player: "..player1.vidas.." V", 40, 100)
 	for i, seguidor in pairs(tabelaPupilos) do
 		seguidor:draw()
   	end
 	--love.graphics.print("")
 	--Tuba
-	--for i, tuba in pairs(tabelatuba) do
-  -- 		tuba:draw()
- 	--end
+	for i, tuba in pairs(tabelatuba) do
+   		tuba:draw()
+ 	end
 end
 --tuba para x e y
 
 function colisao(pup, ant)
-  if pup.xB > ant.x and pup.xB < ant.largura and pup.yB > ant.y and pup.yB < ant.largura then
+  if pup.xB < ant.x + ant.largura and pup.xB + pup.largura > ant.x and pup.yB < ant.y + ant.altura and pup.yB + pup.altura > ant.y then
     return true
+  else
+    return false
+  end
+end
+
+function colisaoP(player, ant)
+  if player.x < ant.x + ant.largura and player.x + player.largura > ant.x and player.y < ant.y + ant.altura and player.y + player.altura > ant.y then
+        return true
   else
     return false
   end
