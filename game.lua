@@ -81,6 +81,11 @@ function game:update(dt)
     end
      for j, tuba in pairs(tabelatuba) do
       tuba:update(dt)
+		     --time do tuba--
+      if tuba.timetuba>20 then
+        table.remove(tabelatuba, j)
+      end
+      --good bye--
      end 
 
   --checando as colisões
