@@ -6,6 +6,8 @@ function tuba:new(velocidade)
     self.altura = love.graphics.getHeight()
     self.onde = love.math.random(0,1)
     self.quando = love.math.random(0,1)
+    self.timetuba = 0;
+    self.vazando = love.math.random(1,4)
     if self.onde == 0 then
     self.x = love.math.random(largura_tela, 2*largura_tela)
     end
@@ -69,12 +71,25 @@ function tuba:update(dt)
       ]]--
   end
     --Fim
+ --Tempo de vida ;(
+   self.timetuba = self.timetuba + dt;
+   if self.timetuba > 10 then
 
+      if self.vazando == 1 then
+         self.x = self.x + 10
+      elseif self.vazando == 2 then
+        self.x = self.x - 10
+      elseif self.vazando == 3 then
+        self.y = self.y + 10
+      else
+        self.y = self.y - 10
+      end
+   end
     
 end
 
 function tuba:draw()
-    love.graphics.rectangle("fill", self.x, self.y, 8, 8)
+    love.graphics.rectangle("line", self.x, self.y, 8, 8)
     --[[Creditos
     love.graphics.print("posicao x -"..self.x.."p", 50, 100 + x)
     love.graphics.print("posicao y -"..self.y.."p", 50, 100 + y)
